@@ -1,0 +1,23 @@
+# Ignore the config.env file inside the config folder
+config/config.env
+
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+/jspm_packages/
+/bower_components/
+
+# Build output
+/build
