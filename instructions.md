@@ -93,3 +93,34 @@ const connectDB = async () => {
 
 module.exports = connectDB;
 ```
+
+# Step 4: Setting up the Morgan
+
+- Using morgan because it is a HTTP request logger middleware for node.js that logs the requests to the console that helps us to debug the application.
+
+- We want to use morgan only in development mode, so we will use the NODE_ENV environment variable to check if the application is running in development mode or not. If it is running in development mode, we will use morgan to log the requests to the console.
+
+- require() morgan and use it as a middleware in the app.js file.
+- Using a conditional statement to check if the application is running in development mode or not. If it is running in development mode, we will use morgan to log the requests to the console.
+
+- Add the following code to the app.js file to activate morgan only in development mode:
+
+```js
+const morgan = require("morgan");
+
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+```
+
+# Step 5: Express Handlebars Setup
+
+- Express Handlebars is a view engine for Express that allows us to use Handlebars. We are using Handlebars because it is a simple templating language that allows us to generate HTML markup with plain JavaScript.
+
+- Add the following code to the app.js file to ebable the express-handlebars view engine:
+
+```js
+const { engine } = require("express-handlebars");
+app.engine(".hbs", engine({ extname: ".hbs" }));
+app.set("view engine", ".hbs");
+```
