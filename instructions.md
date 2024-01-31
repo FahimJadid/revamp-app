@@ -157,7 +157,9 @@ app.set("view engine", ".hbs");
   </head>
   <body>
 
-    {{{body}}}
+    <div class="container">
+      {{{body}}}
+    </div>
 
   </body>
 </html>
@@ -188,14 +190,14 @@ const router = express.Router();
 // @route   GET /
 
 router.get("/", (req, res) => {
-  res.render("Login");
+  res.render("login");
 });
 
 // @desc    Dashboard
 // @route   GET /dashboard
 
 router.get("/dashboard", (req, res) => {
-  res.render("Dashboard");
+  res.render("dashboard");
 });
 
 module.exports = router;
@@ -261,3 +263,121 @@ app.use(express.static(path.join(__dirname, "public")));
 - Create a folder named css inside the public folder.
 - Create a file named `style.css` inside the css folder.
 - Link the `style.css` file to the main.hbs file in the layouts folder. Because the `style.css` file is in the css folder, we need to use the path `/css/style.css` to link to it. Because by default, it looks in to the public folder.
+
+# Step 11: Populating the login layout
+
+- Copy the code from the main.hbs file in the layouts folder and paste it into the login.hbs file.
+- We are adding some css classes to the body tag to style the login page with built-in Materialize CSS classes.
+- Add the following code to the login.hbs file:
+
+```hbs
+<body>
+  <div class="container login-container">
+    <div class="card">
+      <div class="card-content">
+        {{{body}}}
+      </div>
+    </div>
+  </div>
+
+</body>
+```
+
+# Step 12: Updating Routes to use the layouts
+
+- Update the routes in the index.js file in the routes folder to use the layouts.
+- We are using the res.render() method to render the views. The first argument is the name of the view. The second argument is an object that contains the data that will be passed to the view. In this case, we are passing the login
+
+- Add the following code to the index.js file:
+
+```js
+router.get("/", (req, res) => {
+  res.render("login", {
+    layout: "login",
+  });
+});
+```
+
+# Step 13: Adding custom CSS
+
+- Add the following code to the style.css file in the css folder:
+
+```css
+p {
+  margin: 10px 0 !important;
+}
+
+.login-container {
+  width: 400px;
+  margin-top: 50px;
+  text-align: center;
+}
+```
+
+# Step 14: Updating the login view
+
+- Update the login.hbs file in the views folder
+
+- Add the following code to the login.hbs file:
+
+```hbs
+<h3><i class="fa-solid fa-clipboard"></i> InkSync</h3>
+
+<div class="section">
+  <p class="lead">Create Public and Private Notes</p>
+</div>
+
+<div class="section">
+  <a href="/auth/google" class="btn red darken-1">
+    <i class="fa-brands fa-google left"></i>Login with Google
+  </a>
+</div>
+```
+
+# Step 15: Setting up the Google OAuth
+
+- Go to the Google Cloud Console and create a new project.
+- Enable the Google+ API for the project.
+- Create OAuth 2.0 credentials for the project.
+- Add the client ID and client secret to the config.env file.
+
+# Step 16: Setting up the Passport Google 2.0 Strategy
+
+- Create a file named passport.js in the config folder. This is where we will configure the Passport authentication middleware.
+- Require passport in app.js and create a new instance of it. And require the passport.js file in the config folder.
+
+- Configuration module for Passport located at "./config/passport" and passes the passport object as an argument to a function exported by that module. The configuration module typically exports a function that takes passport as a parameter and configures Passport strategies, serialization, and deserialization logic.
+
+- The purpose of this configuration is to set up Passport with the necessary settings, strategies, and hooks for authentication.
+
+- Add the Passport initialization & session middleware
+- The passport.initialize() middleware is responsible for initializing Passport, while passport.session() is used to support persistent login sessions. Passport will serialize and deserialize user instances to and from the session.
+
+session middleware is crucial for maintaining user authentication state across requests. Passport uses the session to keep track of a user's authenticated state and to store user information.
+
+- Session configuration sets up sessions with a secret for session ID cookie signing, prevents unnecessary session saves with resave: false(This is typically set to false to avoid unnecessary session saves. It's recommended to set it to false unless you need it for specific reasons.), and avoids saving uninitialized sessions with saveUninitialized: false(Setting it to false means that the session will not be saved for requests that did not modify the session data. This can help reduce storage usage for new, uninitialized sessions.).
+
+- **Notes: The order of middlewares is crucial because the session middleware, responsible for managing user sessions and looking up users in the database, must be configured before Passport.js middleware. This is because Passport relies on the session to retrieve user information. If there is no session on the request, Passport won't be able to look up the user in the database. Therefore, placing the session middleware before Passport initialization ensures that the necessary session is available for Passport to function correctly.**
+
+- Add the following code to the app.js file:
+
+```js
+const passport = require("passport");
+const session = require("express-session");
+
+// Passport config
+require("./config/passport")(passport);
+
+// Sessions
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+```

@@ -3,8 +3,14 @@ require("dotenv").config({ path: "./config/config.env" });
 const path = require("path");
 const morgan = require("morgan");
 const { engine } = require("express-handlebars");
+const passport = require("passport");
+const session = require("express-session");
 const connectDB = require("./config/database");
+
 connectDB();
+
+// Passport config
+require("./config/passport")(passport);
 
 const app = express();
 
@@ -22,6 +28,20 @@ app.engine(
   })
 );
 app.set("view engine", ".hbs");
+
+// Sessions
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Static folder
 app.use(express.static(path.join(__dirname, "public")));
