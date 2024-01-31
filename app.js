@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config({ path: "./config/config.env" });
+const path = require("path");
 const morgan = require("morgan");
 const { engine } = require("express-handlebars");
 const connectDB = require("./config/database");
@@ -21,6 +22,9 @@ app.engine(
   })
 );
 app.set("view engine", ".hbs");
+
+// Static folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // Routes
 app.use("/", require("./routes/index"));

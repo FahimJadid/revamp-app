@@ -213,3 +213,51 @@ module.exports = router;
 app.use("/", require("./routes/index"));
 app.use("/dashboard", require("./routes/index"));
 ```
+
+# Step 8: Creating the Views
+
+- create login.hbs & dashboard.hbs files inside the views folder. These are the views that will be rendered when the user accesses the root URL of the application and the dashboard route respectively.
+
+# Step 9: Styling the layouts with Materialize CSS & fontawesome
+
+- Add CDN link to the main.hbs file in the layouts folder:
+
+```hbs
+<!-- Put at the beginning -->
+<!-- Compiled and minified CSS Materialize -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+/>
+
+<!-- fontawesome cdn link -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+
+<!--Put At the end -->
+<!-- Compiled and minified JavaScript Materialize -->
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
+></script>
+```
+
+# Step 10: Serving static files:
+
+- Create a folder named public in the root directory of the project. This is where we will store the static files for our application.
+- We are setting up a middleware to serve static files from a directory named "public" in your project. It uses the `express.static` middleware, and the absolute path to the "public" directory is determined using `path.join(__dirname, "public")`. This allows files in the "public" directory to be directly accessible through the root URL of your application.
+- The path provided to the `express.static` function is relative to the directory from where we launch the node process. If we run the express app from another directory, it’s safer to use the absolute path of the directory that you want to serve
+- Add the following code to the app.js file to serve static files:
+
+```js
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+```
+
+- Create a folder named css inside the public folder.
+- Create a file named `style.css` inside the css folder.
+- Link the `style.css` file to the main.hbs file in the layouts folder. Because the `style.css` file is in the css folder, we need to use the path `/css/style.css` to link to it. Because by default, it looks in to the public folder.
