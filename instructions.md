@@ -116,11 +116,100 @@ if (process.env.NODE_ENV === "development") {
 # Step 5: Express Handlebars Setup
 
 - Express Handlebars is a view engine for Express that allows us to use Handlebars. We are using Handlebars because it is a simple templating language that allows us to generate HTML markup with plain JavaScript.
+- imports the engine function from the express-handlebars module. The engine function is used to create an instance of the Handlebars engine with specified configurations.
+- `engine()` method is used to register the express-handlebars view engine with the Express app.
+- The `engine()` method takes two arguments: the name of the view engine and a callback function that returns an instance of the view engine.
+- `app.engine` to register the Handlebars engine for files with the `.hbs` extension. The second argument to engine is an object that contains configuration options for Handlebars. In this case:
+
+`defaultLayout: "main"` specifies that the main layout file for your views is named `"main.hbs"`.
+`extname: ".hbs"` sets the file extension for your views to ".hbs".
+
+- `app.set()` method is used to set the view engine for the Express app. The first argument is the name of the setting, and the second argument is the value of the setting. In this case, we set the view engine to ".hbs". This means that you can render views without specifying the file extension in your routes.
 
 - Add the following code to the app.js file to ebable the express-handlebars view engine:
 
 ```js
 const { engine } = require("express-handlebars");
-app.engine(".hbs", engine({ extname: ".hbs" }));
+app.engine(
+  ".hbs",
+  engine({
+    defaultLayout: "main",
+    extname: ".hbs",
+  })
+);
 app.set("view engine", ".hbs");
+```
+
+# Step 6: Creating the Layouts
+
+- Create a folder named views in the root directory of the project. This is where we will store the views for our application.
+- Inside the views folder, create a folder named layouts. This is where we will store the layout files for our application.
+- Create a files named `main.hbs` & `login.hbs` inside the layouts folder. `main.hbs` is the main layout file for our application.
+
+- Add the following code to the main.hbs file:
+
+```hbs
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Revamp</title>
+  </head>
+  <body>
+
+    {{{body}}}
+
+  </body>
+</html>
+```
+
+# Step 7: Routes Setup
+
+- Create a folder named routes in the root directory of the project. This is where we will store the routes for our application.
+- Create a file named index.js inside the routes folder. This is where we will define the Top level routes for our application. The Top level routes are generic routes that are not specific to any resource. For example, the home page route is a Top level route.
+
+- Import express and create a router instance with the express.Router() method.
+- Use the router object to define the routes for our application.
+
+- Then When a user accesses the root URL of the application with a GET request, this function is called. It uses res.render("Login") to render the "Login" view. This assumes that there is a Handlebars (or other templating engine) view named "Login" in the views folder.
+
+- Same for the dashboard route.
+
+- Export the router object and import it into the app.js file.
+
+- Add the following code to the index.js file:
+
+```js
+const express = require("express");
+
+const router = express.Router();
+
+// @desc    Login/Landing page
+// @route   GET /
+
+router.get("/", (req, res) => {
+  res.render("Login");
+});
+
+// @desc    Dashboard
+// @route   GET /dashboard
+
+router.get("/dashboard", (req, res) => {
+  res.render("Dashboard");
+});
+
+module.exports = router;
+```
+
+- Add the following code to the app.js file to use the routes:
+- This is similar to the way we use middleware in Express. We use the `app.use()` method to use the routes. The first argument is the path for the routes. The second argument is the routes object.
+
+- It's like a Hub for all the routes. It's like listening to all the routes. For example when a request is made to the '/' route, it will be handled by the routes object.
+
+- We are specifying the path for the routes as "/" because when a request is made to the root path from the client side, the routes index.js file will handle the request. We are helping the server to look for the information that it needs.
+
+```js
+// Routes
+app.use("/", require("./routes/index"));
+app.use("/dashboard", require("./routes/index"));
 ```

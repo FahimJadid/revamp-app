@@ -12,8 +12,18 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-app.engine(".hbs", engine({ extname: ".hbs" }));
+// Handlebars
+app.engine(
+  ".hbs",
+  engine({
+    defaultLayout: "main",
+    extname: ".hbs",
+  })
+);
 app.set("view engine", ".hbs");
+
+// Routes
+app.use("/", require("./routes/index"));
 
 const port = process.env.PORT || 8500;
 
