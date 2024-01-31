@@ -341,7 +341,7 @@ p {
 - Create OAuth 2.0 credentials for the project.
 - Add the client ID and client secret to the config.env file.
 
-# Step 16: Setting up the Passport Google 2.0 Strategy
+# Step 16: Setting up the Passport Configuration
 
 - Create a file named passport.js in the config folder. This is where we will configure the Passport authentication middleware.
 - Require passport in app.js and create a new instance of it. And require the passport.js file in the config folder.
@@ -381,3 +381,53 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 ```
+
+# Step 17: Creating the User Model
+
+- We use models to create objects that we can use to interact with the database.
+
+- Create a folder named models in the root directory of the project. This is where we will store the models for our application.
+
+- Create a file named User.js inside the models folder. We will use the User model to create user objects that we can use to interact with the users collection in the database.
+
+- Define a Mongoose schema for a "User" with properties commonly associated with Google OAuth authentication. The schema defines the shape of documents in the users collection. This schema is suitable for storing user information obtained through Google OAuth authentication. When a user signs in through Google, you can create a new instance of the User model using this schema, populate it with the user's data, and save it to your MongoDB database.
+
+- Create a Mongoose model named "User" based on the specified UserSchema and export the created Mongoose model so that it can be imported and used in other parts.
+
+- By exporting the model, you make it accessible in other files, allowing you to perform CRUD (Create, Read, Update, Delete) operations on the "User" collection in your MongoDB database.
+
+- Add the following code to the User.js Model file:
+
+```js
+const mongoose = require("mongoose");
+
+const UserSchema = new mongoose.Schema({
+  googleId: {
+    type: String,
+    required: true,
+  },
+  displayName: {
+    type: String,
+    required: true,
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+module.exports = mongoose.model("User", UserSchema);
+```
+
+# Step 18: Passport Google 2.0 Strategy Setup
