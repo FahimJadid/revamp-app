@@ -508,3 +508,44 @@ module.exports = function (passport) {
 - passport.deserializeUser: This function is used to retrieve the user object based on the stored user ID in the session. It receives the user's ID and passes the user object to the done callback.
 
 # Step 19: Creating the Routes for Google OAuth
+
+- Create a new file named auth.js in the routes folder. This is where we will define the routes for Google OAuth authentication.
+
+- Require express and create a router instance with the express.Router() method.
+
+- `Route for Initiating Google OAuth:` - This route is for the URL path "/google" and is responsible for initiating the Google OAuth 2.0 authentication process when a user accesses this route. It uses the passport.authenticate middleware with the "google" strategy and requests access to the user's profile.
+
+- `Route for Handling Google OAuth Callback:`
+
+- This route is for the URL path "/google/callback" and is designed to handle the callback from Google after the user has authenticated. It uses the passport.authenticate middleware with the "google" strategy.
+
+- If the authentication fails, the user is redirected to the root ("/") path as specified by { failureRedirect: "/" }.
+- If the authentication is successful, the callback function redirects the user to the "/dashboard" path.
+
+- Add the following code to the auth.js file:
+
+```js
+const express = require("express");
+const passport = require("passport");
+
+const router = express.Router();
+
+// @desc    Auth with Google
+// @route   GET /auth/google
+
+router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
+
+// @desc    Google Auth Callback
+// @route   GET /auth/google/callback
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res) => {
+    // Successful authentication, redirect dashboard.
+    res.redirect("/dashboard");
+  }
+);
+
+module.exports = router;
+```
