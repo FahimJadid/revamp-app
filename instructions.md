@@ -447,25 +447,7 @@ module.exports = function (passport) {
         callbackURL: "/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
-        // console.log(profile);
-        const newUser = {
-          googleId: profile.id,
-          displayName: profile.displayName,
-          firstName: profile.name.givenName,
-          lastName: profile.name.familyName,
-          image: profile.photos[0].value,
-        };
-        try {
-          let user = await User.findOne({ googleId: profile.id });
-          if (user) {
-            done(null, user);
-          } else {
-            user = await User.create(newUser);
-            done(null, user);
-          }
-        } catch (err) {
-          console.log(err);
-        }
+        console.log(profile);
       }
     )
   );
@@ -521,6 +503,7 @@ module.exports = function (passport) {
 
 - If the authentication fails, the user is redirected to the root ("/") path as specified by { failureRedirect: "/" }.
 - If the authentication is successful, the callback function redirects the user to the "/dashboard" path.
+- Require the auth.js file in the app.js file to use the routes.
 
 - Add the following code to the auth.js file:
 
@@ -548,4 +531,54 @@ router.get(
 );
 
 module.exports = router;
+```
+
+- Add the following code to the app.js file to use the routes:
+
+```js
+app.use("/auth", require("./routes/auth"));
+```
+
+# Step 20: Storing Google data in the database
+
+- This specific part is the callback function that gets executed after a user has successfully authenticated with Google.
+
+- `Callback Function Parameters:`
+
+- `(accessToken, refreshToken, profile, done) => { /* ... */ }:`
+- This is an asynchronous callback function that receives the following parameters:
+  `accessToken:` The access token obtained from Google after successful authentication.
+  `refreshToken:` The refresh token that can be used to obtain a new access token.
+  `profile:` The user's Google profile, containing information like ID, display name, name(family & given), and photos.
+  `done:` A callback function provided by Passport.js to indicate the completion of the authentication process.
+
+- `Creating a New User or Retrieving Existing User:`
+- We are attempting to find an existing user in the local database based on the Google ID. If a user is found, the user is passed to the done callback, indicating a successful authentication.
+
+If no user is found, a new user is created using User.create(newUser). The newly created user is then passed to the done callback.
+
+- Add the following code to the passport.js file in the config folder:
+
+```js
+async (accessToken, refreshToken, profile, done) => {
+  // console.log(profile);
+  const newUser = {
+    googleId: profile.id,
+    displayName: profile.displayName,
+    firstName: profile.name.givenName,
+    lastName: profile.name.familyName,
+    image: profile.photos[0].value,
+  };
+  try {
+    let user = await User.findOne({ googleId: profile.id });
+    if (user) {
+      done(null, user);
+    } else {
+      user = await User.create(newUser);
+      done(null, user);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
 ```
