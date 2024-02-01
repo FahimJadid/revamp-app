@@ -431,3 +431,80 @@ module.exports = mongoose.model("User", UserSchema);
 ```
 
 # Step 18: Passport Google 2.0 Strategy Setup
+
+- Add the following code to the passport.js file in the config folder:
+
+```js
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const User = require("../models/User");
+
+module.exports = function (passport) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/auth/google/callback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        // console.log(profile);
+        const newUser = {
+          googleId: profile.id,
+          displayName: profile.displayName,
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+          image: profile.photos[0].value,
+        };
+        try {
+          let user = await User.findOne({ googleId: profile.id });
+          if (user) {
+            done(null, user);
+          } else {
+            user = await User.create(newUser);
+            done(null, user);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    )
+  );
+
+  // Serialize and Deserialize
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+  passport.deserializeUser(async (id, done) => {
+    try {
+      let user = await User.findById(id);
+      done(null, user);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+};
+```
+
+- `Google OAuth 2.0 Strategy Configuration:`
+
+- The code sets up a Google OAuth 2.0 authentication strategy using passport-google-oauth20. It configures the strategy with the Google client ID, client secret, and callback URL.
+
+- clientID and clientSecret: These are the credentials obtained from the Google Developers Console when we create a project and enable the Google+ API.
+
+- callbackURL: This is the URL where Google will redirect the user after they have authenticated. In this case, it is set to "/auth/google/callback," so we need to define a route for handling Google callback in the application.
+
+- The strategy's async callback function is executed when a user successfully authenticates with Google. It receives the accessToken, refreshToken, profile, and a done callback.
+
+- The profile object contains information about the authenticated user, and the code uses it to create or find a corresponding user in the local database.
+
+- `User Creation or Retrieval Logic:`
+
+- The code checks if a user with the same Google ID already exists in the local database. If the user exists, it calls done(null, user) to indicate successful authentication. If not, a new user is created using the provided newUser object, and done(null, user) is called.
+
+- `Serialize and Deserialize User Functions:`
+
+- passport.serializeUser: This function is used to determine which data from the user object should be stored in the session. It receives a user object and passes the user's ID to the done callback.
+
+- passport.deserializeUser: This function is used to retrieve the user object based on the stored user ID in the session. It receives the user's ID and passes the user object to the done callback.
+
+# Step 19: Creating the Routes for Google OAuth
