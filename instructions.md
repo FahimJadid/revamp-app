@@ -582,3 +582,27 @@ async (accessToken, refreshToken, profile, done) => {
   }
 };
 ```
+
+# Step 21: Logout Route
+
+- Inside the auth.js file in the routes folder, create a route for logging out the user. This route is for the URL path "/logout" and is designed to log out the user and redirect them to the root ("/") path.
+
+- Passport exposes a logout() function on req (also aliased as logOut()) that can be called from any route handler which needs to terminate a login session. Invoking logout() will remove the req.user property and clear the login session (if any).
+
+- It is a good idea to use POST or DELETE requests instead of GET requests for the logout endpoints, in order to prevent accidental or malicious logouts.
+
+- Add the following code to the auth.js file:
+
+```js
+// @desc    Logout User
+// @route   POST /auth/logout
+
+router.post("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
+```
